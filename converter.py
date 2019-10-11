@@ -1,7 +1,7 @@
 import xnat
 import os
 import sys
-
+import shutil
 from glob import glob
 
 from xnat.exceptions import XNATResponseError
@@ -9,13 +9,7 @@ from dcmrtstruct2nii import dcmrtstruct2nii
 
 
 def convert_subject(project, subject, datafolder, session):
-    import os
-    import shutil
-
-    # Connect to XNAT
-    subject = session.projects[project].subjects[subject]
-    subject_name = subject.label
-
+    # Create output directory
     outdir = datafolder + '/{}'.format(subject.label)
     if not os.path.exists(outdir):
         os.makedirs(outdir)
@@ -30,7 +24,7 @@ def convert_subject(project, subject, datafolder, session):
         # FIXME: Need a way to smartly check whether we have a matching RT struct and image
         # Current solution: We only download the CT sessions, no PET / MRI / Other scans
         # Specific for STW Strategy BMIA XNAT projects
-        
+
         if experiment.session_type is None:  # some files in project don't have _CT postfix
             print(f"\tSkipping patient {subject.label}, experiment {experiment.label}: type is not CT but {experiment.session_type}.")
             continue
@@ -52,6 +46,7 @@ def convert_subject(project, subject, datafolder, session):
                 download_counter += 1
 
     # Parse resources and throw warnings if they not meet the requirements
+    subject_name = subject.label
     if download_counter == 0:
         print(f'[WARNING] Skipping subject {subject_name}: no (suitable) resources found.')
         return False
@@ -134,7 +129,7 @@ def convert_project(project_name, xnat_url, tempfolder, keyword=''):
 
     subjects_len = len(project.subjects)
     subjects_counter = 1
-    for s in project.subjects:
+    for s in project.subjects[0:2]:
         print(f'Working on subject {subjects_counter}/{subjects_len}')
 
         subjects_counter += 1
@@ -142,7 +137,7 @@ def convert_project(project_name, xnat_url, tempfolder, keyword=''):
         # if not 'HN1067' in project.subjects[s].label:
         #     continue
 
-        if not project.subjects[s].label.startswith(keyword):
+        if not s.label.startswith(keyword):
             continue
 
         # subject = project.subjects[s]
