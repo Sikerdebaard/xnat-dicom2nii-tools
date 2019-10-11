@@ -129,7 +129,7 @@ def convert_project(project_name, xnat_url, tempfolder, keyword=''):
 
     subjects_len = len(project.subjects)
     subjects_counter = 1
-    for s in project.subjects[0:2]:
+    for s in project.subjects:
         print(f'Working on subject {subjects_counter}/{subjects_len}')
 
         subjects_counter += 1
