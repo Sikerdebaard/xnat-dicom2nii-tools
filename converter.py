@@ -18,7 +18,6 @@ def convert_subject(project, subject, datafolder, session):
     download_counter = 0
     resource_labels = list()
     for e in subject.experiments:
-        resmap = {}
         experiment = subject.experiments[e]
 
         # FIXME: Need a way to smartly check whether we have a matching RT struct and image
@@ -32,6 +31,9 @@ def convert_subject(project, subject, datafolder, session):
         if '_CT' not in experiment.session_type:
             print(f"\tSkipping patient {subject.label}, experiment {experiment.label}: type is not CT but {experiment.session_type}.")
             continue
+
+        # Initialize empty resource map
+        resmap = {}
 
         for s in experiment.scans:
             scan = experiment.scans[s]
