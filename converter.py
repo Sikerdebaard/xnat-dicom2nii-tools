@@ -41,9 +41,15 @@ def convert_subject(project, subject, datafolder, session):
                 resource_label = scan.resources[res].label
                 resmap[resource_label] = scan
                 print(f'resource is {resource_label}')
-                scan.resources[res].download_dir(outdir)
-                resource_labels.append(resource_label)
-                download_counter += 1
+
+                try:
+                    scan.resources[res].download_dir(outdir)
+                    resource_labels.append(resource_label)
+                    download_counter += 1
+                except XNATResponseError:
+                    print("\t Resource empty, skipping.")
+                    continue
+
 
     # Parse resources and throw warnings if they not meet the requirements
     subject_name = subject.label
@@ -55,7 +61,7 @@ def convert_subject(project, subject, datafolder, session):
         print(f'[WARNING] Skipping subject {subject_name}: no secondary resources found.')
         return False
 
-    secondary_folder = os.path.join(outdir, '*', 'scans', '*', 'resources', 'secondary', 'files')
+    secondary_folder = glob(os.path.join(outdir, '*', 'scans', '*', 'resources', 'secondary', 'files'))[0]
     secondary_files = glob(os.path.join(secondary_folder, '*'))
     if len(secondary_files) == 0:
         print(f'[WARNING] Skipping subject {subject_name}: secondary resources is empty.')
@@ -129,7 +135,8 @@ def convert_project(project_name, xnat_url, tempfolder, keyword=''):
 
     subjects_len = len(project.subjects)
     subjects_counter = 1
-    for s in project.subjects:
+    for s in range(0, subjects_len):
+        s = project.subjects[s]
         print(f'Working on subject {subjects_counter}/{subjects_len}')
 
         subjects_counter += 1
