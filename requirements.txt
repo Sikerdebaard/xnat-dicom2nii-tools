@@ -7,7 +7,7 @@ cleo==0.7.2
 clikit==0.2.4
 cloudpickle==1.2.2
 cycler==0.10.0
-dask==2.5.2
+dask==2021.10.0
 dcmrtstruct2nii==1.0.15
 decorator==4.4.0
 docutils==0.15.2
